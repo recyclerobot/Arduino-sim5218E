@@ -1,3 +1,22 @@
+/*  
+ *  This program is free software: you can redistribute it and/or modify 
+ *  it under the terms of the GNU General Public License as published by 
+ *  the Free Software Foundation, either version 3 of the License, or 
+ *  (at your option) any later version. 
+ *  
+ *  This program is distributed in the hope that it will be useful, 
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ *  GNU General Public License for more details. 
+ *  
+ *  You should have received a copy of the GNU General Public License 
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+ *  
+ *  Author: Alejandro Gallego (http://www.libelium.com)
+ *  Author: Thijs Bernolet (http://www.weworkweplay.com)
+ *
+ */
+
 int8_t answer;
 int onModulePin= 2;
 char gps_data[100];
@@ -116,33 +135,12 @@ void push_to_api(){
                 Serial.print("Data received: ");
                 Serial.println(data_size);
                 
-                
-                /*
-                if (data_size > 0)
-                {
-                    while(Serial.available() < data_size);
-                    Serial.read();
-
-                    for (int y = 0; y < data_size; y++)
-                    {
-                        data[x] = Serial.read();
-                        x++;
-                    }
-                    data[x] = '\0';
-                }
-                else
-                {
-                    Serial.println("Download finished");    
-                }
-                */
             }
             else
             {
                 Serial.println("Error getting the url");
                 data_size = 0;
             }
-
-            // answer = sendATcommand2("", "+CHTTPACT: DATA,", "+CHTTPACT:0", 20000);
             
         }while (answer != 1);
 
