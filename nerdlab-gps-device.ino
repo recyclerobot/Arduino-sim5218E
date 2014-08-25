@@ -1,25 +1,77 @@
-int8_t answer;
-int onModulePin= 2;
-char gps_data[100];
-int counter;
+<<<<<<< HEAD:nerdlab-gps-device.ino
+// SCHEMA
+// SETUP > LOOP > GET GPS > PUSH TO API > RECORD AUDIO > UPLOAD TO FTP > TAKE PICTURE > UPLOAD TO FTP > OK
 
-int aux;
-int data_size = 0;
-int end_file = 0;
+/* PIN VARIABLES */
+int onModulePin = 2;
+
+/* DEBUG OMODE */
+boolean debugMode = true;
+
+/* SERVER API VARIALBLES */
+char url[]         = "renaa.rs";
+char host[]        = "www.renaa.rs";
+char apiEndpoint[] = "/echo/track.php?g=";
+int port           = 80;
+char ftpServer[]   = "ftp.endlessecho.recyclerobot.com";
+char ftpUser[]     = "endlessecho";
+char ftpPassword[] = "charliebravotango";
+char ftpDir[]      = "/endless_audio";
+int ftpPort        = 21;
+
+/* GLOBAL VARIABLES */
+int    counter;
+=======
+/*  
+ *  This program is free software: you can redistribute it and/or modify 
+ *  it under the terms of the GNU General Public License as published by 
+ *  the Free Software Foundation, either version 3 of the License, or 
+ *  (at your option) any later version. 
+ *  
+ *  This program is distributed in the hope that it will be useful, 
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ *  GNU General Public License for more details. 
+ *  
+ *  You should have received a copy of the GNU General Public License 
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+ *  
+ *  Author: Alejandro Gallego (http://www.libelium.com)
+ *  Author: Thijs Bernolet (http://www.weworkweplay.com)
+ *
+ */
+
+>>>>>>> FETCH_HEAD:nerdlab_gps_device.ino
+int8_t answer;
+int    aux;
+int    data_size = 0;
+int    end_file = 0;
+int    x = 0;
+long   previous;
+
+/* STORE VARIABLES */
+char gps_data[100];
 char aux_str[250];
 char data[250];
-int x = 0;
-long previous;
-char url[ ]="renaa.rs";
-int port= 80;
 char request[250];
 
+/* AUDIO VARS */
+char audio_clip_dir[] = "C:/Audio";
+char audio_clip_name[20];
+
+/* PICTURE VARS */
+char picture_dir[] = "C:/Picture/";
+char picture_name[20];
+
+/* SETUP AND INIT */
 void setup(){
 
     pinMode(onModulePin, OUTPUT);
     Serial.begin(115200);    
 
-    Serial.println("Starting...");
+    debugPrint("Starting...");
+
+    // power our SIM5128
     power_on();
 
     delay(5000);
@@ -29,69 +81,50 @@ void setup(){
     
     delay(3000);
 
-    Serial.println("Connecting to the network...");
+    // connect to the mobile network
+    debugPrint("Connecting to the network...");
 
     while( (sendATcommand("AT+CREG?", "+CREG: 0,1", 500) || 
             sendATcommand("AT+CREG?", "+CREG: 0,5", 500)) == 0 );
 
     sendATcommand("AT+CGSOCKCONT=1,\"IP\",\"web.be\"","OK",1000); 
-    // if not authentication requiered comment or remove the next line
     sendATcommand("AT+CSOCKAUTH=1,1,,\"web\",\"web\"","OK",1000);
-    sendATcommand("AT+CGPSURL=\"supl.google.com:7276\"","OK",1000);    // sets GPS server
-    sendATcommand("AT+CGPSSSL=0","OK",1000);    // without certificate
+
+    // set GPS server without certificate
+    sendATcommand("AT+CGPSURL=\"supl.google.com:7276\"","OK",1000);
+    sendATcommand("AT+CGPSSSL=0","OK",1000);
     
-    answer = sendATcommand("AT+CGPS=1,2","OK",1000);    // starts GPS session in MS-based mode
-    if (answer == 0)
-    {
-        Serial.println("Error starting the GPS");
-        Serial.println("The code stucks here!!");
+    // start gps node in GPS-MS
+    answer = sendATcommand("AT+CGPS=1,2","OK",1000);
+    if (answer == 0){
+        debugPrint("Error starting the GPS");
+        debugPrint("The code stucks here!!");
         while(1);
     }
 }
+
+/* MAIN LOOP */
 void loop(){
 
-    answer = sendATcommand("AT+CGPSINFO","+CGPSINFO:",1000);    // request info from GPS
-    if (answer == 1)
-    {
+    // get gps location
+    answer = sendATcommand("AT+CGPSINFO","+CGPSINFO:",1000);
+    
+    if (answer == 1){
         counter = 0;
         do{
             while(Serial.available() == 0);
             gps_data[counter] = Serial.read();
             counter++;
-        }
-        while(gps_data[counter - 1] != '\r');
-        gps_data[counter] = '\0';
-        if(gps_data[0] == ',')
-        {
-             Serial.println("No GPS data available");  
-        }
-        else
-        {
-            Serial.print("GPS data:");
-            Serial.println(gps_data);  
-            Serial.println("");
-            
-            push_to_api();
-    
-        }       
-
-    }
-    else
-    {
-        Serial.println("Error"); 
-    }
-
-    delay(5000);
-}
-
-void push_to_api(){
-  // request the url
-    sprintf(aux_str, "AT+CHTTPACT=\"%s\",%d", url, port);
-    answer = sendATcommand(aux_str, "+CHTTPACT: REQUEST", 60000);
-
-    if (answer == 1){
-        sprintf(request, "GET /echo/?g=%s HTTP/1.1\r\nHost: www.renaa.rs\r\n\r\n", gps_data);
+        }while(gps_data[counter - 1] != '\r');
         
+<<<<<<< HEAD:nerdlab-gps-device.ino
+        gps_data[counter] = '\0';
+        if(gps_data[0] == ','){
+             debugPrint("No GPS data available");  
+        }else{
+            debugPrint("GPS data:");
+            debugPrint(gps_data);
+=======
         Serial.println(request);
         // Sends <Ctrl+Z>
         aux_str[0] = 0x1A;
@@ -116,33 +149,12 @@ void push_to_api(){
                 Serial.print("Data received: ");
                 Serial.println(data_size);
                 
-                
-                /*
-                if (data_size > 0)
-                {
-                    while(Serial.available() < data_size);
-                    Serial.read();
-
-                    for (int y = 0; y < data_size; y++)
-                    {
-                        data[x] = Serial.read();
-                        x++;
-                    }
-                    data[x] = '\0';
-                }
-                else
-                {
-                    Serial.println("Download finished");    
-                }
-                */
             }
             else
             {
                 Serial.println("Error getting the url");
                 data_size = 0;
             }
-
-            // answer = sendATcommand2("", "+CHTTPACT: DATA,", "+CHTTPACT:0", 20000);
             
         }while (answer != 1);
 
@@ -231,31 +243,29 @@ int8_t sendATcommand2(char* ATcommand, char* expected_answer1,
     while( Serial.available() > 0) Serial.read();    // Clean the input buffer
 
     Serial.println(ATcommand);    // Send the AT command 
+>>>>>>> FETCH_HEAD:nerdlab_gps_device.ino
 
+            // push location to our api
+            push_to_api(gps_data);
 
-    x = 0;
-    previous = millis();
+            // record audio and FTP to our server
+            record_audio(audio_clip_name, audio_clip_dir);
 
-    // this loop waits for the answer
-    do{
+            // take picture and upload to our server
+            take_picture(picture_name, picture_dir);
 
-        if(Serial.available() != 0){    
-            response[x] = Serial.read();
-            x++;
-            // check if the desired answer is in the response of the module
-            if (strstr(response, expected_answer1) != NULL)    
-            {
-                answer = 1;
-            }
-            // check if the desired answer is in the response of the module
-            if (strstr(response, expected_answer2) != NULL)    
-            {
-                answer = 2;
-            }
-        }
-        // Waits for the asnwer with time out
+            debugPrint("All Good!");
+        }       
+    }else{
+      debugPrint("Error"); 
     }
-    while((answer == 0) && ((millis() - previous) < timeout));    
 
+<<<<<<< HEAD:nerdlab-gps-device.ino
+    debugPrint("Loop finished!");
+    delay(5000);
+}
+=======
     return answer;
 }
+
+>>>>>>> FETCH_HEAD:nerdlab_gps_device.ino
