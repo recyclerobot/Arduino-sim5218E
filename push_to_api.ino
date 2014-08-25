@@ -27,8 +27,7 @@ void push_to_api(char* target_gps_data){
                 }
                 while(aux != 0x0D);
 
-                debugPrint("Data received: ");
-                debugPrint(data_size);
+                debugPrint("Data received");
                 
             }
             else
