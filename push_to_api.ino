@@ -5,7 +5,7 @@ void push_to_api(char* target_gps_data){
 
     if (answer == 1){
         sprintf(request, "GET %s%s HTTP/1.1\r\nHost: %s\r\n\r\n", apiEndpoint, target_gps_data, host);
-        
+        debugPrint(request);
         Serial.println(request);
         // Sends <Ctrl+Z>
         aux_str[0] = 0x1A;

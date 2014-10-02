@@ -1,4 +1,7 @@
-void record_audio(char* targetLocalFilename, char* targetLocalFileDir){
+void record_audio(){
+  
+    char targetLocalFilename[250];
+    char targetLocalFileDir[250];
 
     // start record
     answer = sendATcommand2("AT+CQCPREC=0,amr", "C:/Audio/", "ERROR", 5000);
